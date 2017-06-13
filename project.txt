@@ -1,0 +1,117 @@
+import pygame
+import time
+import random
+pygame.init()
+
+black=(0,0,0)
+yellow=(255,255,0)
+white=(255,255,255)
+surfaceHeight=400
+surfaceWidth=800
+Surface=pygame.display.set_mode((surfaceWidth,surfaceHeight))
+pygame.display.set_caption("Dota3")
+clock=pygame.time.Clock()
+
+img=pygame.image.load("Helicopter.png")
+
+def blocks(x_block,y_block,block_width,block_height,gap):
+    pygame.draw.rect(Surface ,white, [x_block, y_block, block_width, block_height])
+    pygame.draw.rect(Surface, white, [x_block, y_block+block_height+gap, block_width, surfaceHeight])
+  #  pygame.draw.rect(Surface, white, [x_block, surfaceHeight-y_block-gap+10, block_width, block_height])
+
+
+def replay_quit():
+    for event in pygame.event.get([pygame.KEYDOWN,pygame.QUIT]):
+        if event.type==pygame.QUIT:
+            pygame.quit()
+            quit()
+        elif event.type==pygame.KEYDOWN:
+            if event.key==pygame.K_x:
+                pygame.quit()
+                quit()
+            #continue
+            return event.key
+    return None
+
+
+def makeTextObj(text,font):
+    textSurface = font.render(text,True,white)
+    return textSurface, textSurface.get_rect()
+
+
+def msg_display(text):
+    smallText=pygame.font.Font('freesansbold.ttf',20)
+    largeText=pygame.font.Font('freesansbold.ttf',130)
+
+    bigtext, bigtextrect = makeTextObj(text,largeText)
+    bigtextrect.center = surfaceWidth/2, surfaceHeight /2
+    Surface.blit(bigtext,bigtextrect)
+
+    minitext , minitextrect = makeTextObj("Press any key to restart",smallText)
+    minitextrect.center=surfaceWidth/2 ,((surfaceHeight/2) +100)
+    Surface.blit(minitext,minitextrect)
+
+    minitext, minitextrect = makeTextObj("Press 'X' key to quit", smallText)
+    minitextrect.center = surfaceWidth / 2, ((surfaceHeight / 2) + 120)
+    Surface.blit(minitext, minitextrect)
+
+    pygame.display.update()
+    #time.sleep(1)
+
+    while replay_quit()==None:
+        clock.tick()
+    main()
+
+
+
+def func_game_over():
+    msg_display('GAME OVER')
+
+def kappa(x,y,image):
+    Surface.blit(image,(x,y))
+
+def main():
+
+    x = 150
+    y = 200
+    y_move = 0
+    x_block= surfaceWidth
+    y_block =0
+    block_width=75
+    block_height=random.randint(0,surfaceHeight-100)
+    gap =125
+    block_move=3
+
+    game_over = False
+
+    while not game_over:
+        for event in pygame.event.get():
+            if event.type==pygame.QUIT:
+                game_over=True
+            if event.type==pygame.KEYDOWN:   #to check if button is pressed
+                if event.key ==  pygame.K_UP:
+                    y_move=-5
+
+            if event.type == pygame.KEYUP:     #to check if released
+                if event.key == pygame.K_UP:
+                    y_move = 5
+
+        y+=y_move
+        Surface.fill(black)
+        blocks(x_block,y_block,block_width,block_height,gap)
+        x_block-=3
+        kappa(x,y,img)
+
+        if y>surfaceHeight-40 or y<0:
+            func_game_over()
+
+        if x_block<(-1*block_width):
+            x_block=surfaceWidth
+            block_height=random.randint(0,surfaceHeight-100)
+
+        pygame.display.update()
+        clock.tick(160)
+main()
+
+pygame.quit()
+quit(
